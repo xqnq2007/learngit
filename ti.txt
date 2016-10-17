@@ -155,6 +155,56 @@ import timeit
 print timeit.repeat("recursion(10,4)",'from __main__ import recursion',timeit.default_timer,2,10000)
 print timeit.repeat("iteration(10,4)",'from __main__ import iteration',timeit.default_timer,2,10000)
 
+C:
+
+#include <stdio.h>
+#include <time.h>
+int digui(int n, int k){
+	if (n <= k){
+		return 1;
+	}
+	int i = 0;
+	int tmp = 0;
+	while (i < k){
+		tmp += digui(n - 1 - i, k);
+		i++;
+	}
+	return tmp;
+}
+int diedai(int n, int k){
+	if (n <= k){
+		return 1;
+	}
+	int a,b,c,d,tmp;
+	a = b = c = d = 1;
+	tmp = 0;
+	for (int i = 5; i <= n;i++){
+		tmp = a + b + c + d;
+		a = b;
+		b = c;
+		c = d;
+		d = tmp;
+	}
+	return tmp;
+}
+void main(){	
+	clock_t t1, t2,t3,t4;
+	double thetime;
+	printf("递归用时：");
+	t1 = clock();
+	digui(35,4);
+	t2 = clock();
+	thetime = (double)(t2 - t1)/CLOCKS_PER_SEC;	
+	printf("%f\n", thetime);
+	printf("迭代用时：");
+	t3 = clock();
+	diedai(35, 4);
+	t4 = clock();
+	thetime = (double)(t4 - t3) / CLOCKS_PER_SEC;
+	printf("%f\n", thetime);
+	getchar();
+}
+
 3 一个二叉查找树：如果一个结点的左结点不为空，其左结点小于该结点的值，如果右结点不为空，其右结点大于该结点的值，
                     5
 		3	8
