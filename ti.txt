@@ -1,0 +1,181 @@
+百度03年自然语言处理笔试
+1 序列化和反序列化的目的和应用?
+目的：于存储对象状态为另一种通用格式，比如存储为二进制、xml、json等等
+反序列化：从这种格式转换回来
+使用序列化主要是因为跨平台和对象存储的需求，因为网络上只允许字符串或者二进制格式，而文件需要使用二进制流格式，如果想把一个内存中的对象存储下来就必须使用序列化转换为xml（字符串）、json（字符串）或二进制（流）
+
+2 OSI七层模型是什么 HTTP属于哪一层
+物理层、数据链路层、网络层、传输层、会话层、表示层和应用层
+HTTP属于应用层
+
+3 写出一个C语言的代码从编写到运行的全部执行过程
+C源程序到运行程序步骤：
+1.编辑：输入源程序并存盘(.C)
+2.编译：将源程序翻译为目标文件(.OBJ)
+3.链接：将目标文件生成可执行文件( .EXE)
+4.运行：执行.EXE文件,得到运行结果
+
+用递归的算法实现这样一个函数，计算一个字符串最大连续相同字符数
+
+def getmaxcon(str,cur=1,count=1,maxlen=1):
+    #str='aabbccc'
+     
+    if len(str)==0:
+        return 0
+    elif len(str)==1:
+        return 1   
+    if cur==len(str):
+        return maxlen
+    if str[cur]==str[cur-1]:
+        count=count+1
+        if(count>maxlen):
+            maxlen=count
+    else:
+        count=1
+    return getmaxcon(str,cur+1,count,maxlen)
+#print getmaxcon(1,1,1)
+str=raw_input("enter a str")
+print getmaxcon(str)
+
+百度04年自然语言处理笔试
+1 当前计算机系统一般会采用层次结构来存储数据，请介绍下典型的计算机存储系统一般分为哪几个层次，为什么采用分层存储数据能有效提高程序的执行效率?
+所谓存储系统的层次结构，就是把各种不同存储容量、存取速度和价格的存储器按层次结构组成多层存储器，并通过管理软件和辅助硬件有机组合成统一的整体，使所存放的程序和数据按层次分布在各种存储器中。目前，在计算机系统中通常采用三级层次结构来构成存储系统，主要由高速缓冲存储器Cache、主存储器和辅助存储器组成。
+      存储系统多级层次结构中，由上向下分三级，其容量逐渐增大，速度逐级降低，成本则逐次减少。整个结构又可以看成两个层次：它们分别是cache一主存层次和主存一辅存层次。这个层次系统中的每一种存储器都不再是孤立的存储器，而是一个有机的整体。它们在辅助硬件和计算机操作系统的管理下，可把主存一辅存层次作为一个存储整体，形成的可寻址存储空间比主存储器空间大得多。由于辅存容量大，价格低，使得存储系统的整体平均价格降低。由于Cache的存取速度可以和CPU的工作速度相媲美，故cache一主存层次可以缩小主存和CPU之间的速度差距，从整体上提高存储器系统的存取速度。尽管Cache成本高，但由于容量较小，故不会使存储系统的整体价格增加很多。
+      综上所述，一个较大的存储系统是由各种不同类型的存储设备构成，是一个具有多级层次结构的存储系统。该系统既有与CPU相近的速度，又有极大的容量，而成本又是较低的。其中高速缓存解决了存储系统的速度问题，辅助存储器则解决了存储系统的容量问题。采用多级层次结构的存储器系统可以有效的解决存储器的速度、容量和价格之间的矛盾。
+2 unix/Linux系统的僵尸进程是如何产生的?有什么危害?如何避免?
+一个进程在调用exit命令结束自己的生命的时候，其实他并没有真正的被销毁，而是留下一个称为僵尸进程（Zombie）的数据结构（系统调用exit，他的作用是使进程退出，但是也仅仅限于一个正常的进程变成了一个僵尸进程，并不能完全将其销毁）。在linux进程的状态中，僵尸进程是非常特殊的一种，它已经放弃了几乎所有的内存空间，没有任何可执行代码，也不能被调度，仅仅在进程列表中保留一个位置，记载该进程的退出状态信息供其他进程收集，除此之外，僵尸进程不再占有任何存储空间。他需要他的父进程来为他收尸，如果他的父进程没有安装SIGCHLD信号处理函数调用wait 或 waitpid() 等待子进程结束，有没有显式忽略该信号，那么它就一直保持僵尸状态，如果这时候父进程结束了，那么init进程会自动接手这个子进程，为他收尸，他还是能被清除掉的。但是如果父进程是一个循环，不会结束，那么子进程就会一直保持僵尸状态，这就是系统中为什么有时候会有很多的僵尸进程。
+避免zombie的方法
+1）在svr4中，如果调用signal或是sigset将SIGCHLD的配置设置为忽略，则不会产生僵死子进程。另外，使用svr4版本sigaction，则可设置SA_NOCLDWAIT标志以避免子进程僵死。Linux中也可以使用这个，在一个程序开始调用这个函数signal(SIGCHLD,SIG_IGN)；
+2）调用fork两次
+3）用waitpid等待子进程返回。
+
+在fork()/execve()过程中，假设子进程结束时父进程仍存在，而父进程fork()之前既没安装SIGCLD信号处理函数调用 waitpid()等待子进程结束，又没有显式忽略该信号，则子进程成为僵尸进程，无法正常结束，此时即使是root身份kill -9也不能杀死僵尸进程。补救办法是杀死僵尸进程的父进程(僵尸进程的父进程必然存在)，僵尸进程成为”孤儿进程”，过继给1号进程init，init始终会负责清理僵尸进程。
+
+产生原因：
+1.在子进程终止后到父进程调用wait()前的时间里，子进程被称为zombie。
+2.网络原因有时会引起僵死进程。
+
+解决方法：
+1.设置SIGCLD信号为SIG_IGN，系统将不产生僵死进程。
+2.用两次fork()，而且使紧跟的子进程直接退出，是的孙子进程成为孤儿进程，从而init进程将负责清除这个孤儿进程。
+
+父进程使用wait()或者waitpid()之类的函数等待子进程退出
+父进程先产生一个子进程，然后子进程再产生一个孙子进程，子进程在孙子进程之前退出。
+使用信号函数sigaction为SIGCHLD设置wait处理函数。
+
+1 两个数组[1,3,3,6,2,8,9]  [3,7,1,5,4] 求出两个数组中既不在第一个又不在第二个数组中的所有元素
+[6,2,8,9,7,4]
+
+2 一个类似裴波那契数列1,1,1,1,4,7,13,25,49,...其求解程序如下:
+int fnk(int n, int k){
+	
+
+}
+改进该程序 ，使其时间复杂度和空间复杂度最小
+C++
+#include<iostream>
+using namespace std;
+#include<ctime>
+int f1(int n,int k){
+	if (n<=k)
+		return 1;
+	else{
+		int tmp = 0;
+		for (int i = 0; i < k; i++){
+			tmp += f1(n - 1 - i, k);
+		}
+		return tmp;
+	}
+	//return 0;
+}
+int f2(int n, int k){
+	if (n <= k)
+		return 1;
+	else{
+		int tmp = 0;
+		int a1, a2, a3, a4;
+		a1=a2=a3=a4 = 1;
+		for (int i = 5; i < n; i++){
+			tmp = a1 + a2 + a3 + a4;
+			a1 = a2;
+			a2 = a3;
+			a3 = a4;
+			a4 = tmp;
+		}
+		return tmp;
+	}
+	//return 0;
+}
+int main(){
+	/*int f1 = 0, f2 = 1, t, n = 1;*/
+	//cout << "第一个" << f1 << "第二个" << f2 << endl;
+	/*for (int i = 1; i < 20; i++){		
+		cout << "第" << i << "个" << f1(i,4) << endl;
+
+	}*/
+	clock_t t1, t2,t3,t4;
+	t1 = clock();
+	f1(30, 4);
+	t2 = clock();
+	cout << "开始时间"<<(float)t1/CLOCKS_PER_SEC <<endl;
+	cout << "结束时间" << (float)t2 / CLOCKS_PER_SEC << endl;
+	cout << "f1运行时间" << (float)t2 / CLOCKS_PER_SEC - t1 / CLOCKS_PER_SEC << endl;
+	t3 = clock();
+	f2(30, 4);
+	t4 = clock();
+	cout << "开始时间" << (float)t3 / CLOCKS_PER_SEC << endl;
+	cout << "结束时间" << (float)t4 / CLOCKS_PER_SEC << endl;
+	cout << "f2运行时间" << (float)t4 / CLOCKS_PER_SEC - t3 / CLOCKS_PER_SEC << endl;
+	getchar();
+	return 0;
+	
+}
+py:
+
+def recursion(n,k):
+    if n<=k:
+        return 1
+    else:
+        i,tmp=0,0        
+        while(i<k):
+            tmp+=recursion(n-1-i,k)
+            i+=1
+        return tmp
+#print recursion(20, 4)
+def iteration(n,k):
+    if n<=k:
+        return 1
+    else:
+        a,b,c,d,tmp=1,1,1,1,0       
+        for i in range(5,n+1):
+            tmp=a+b+c+d
+            a,b,c,d=b,c,d,tmp
+        return tmp
+import timeit
+print timeit.repeat("recursion(10,4)",'from __main__ import recursion',timeit.default_timer,2,10000)
+print timeit.repeat("iteration(10,4)",'from __main__ import iteration',timeit.default_timer,2,10000)
+
+3 一个二叉查找树：如果一个结点的左结点不为空，其左结点小于该结点的值，如果右结点不为空，其右结点大于该结点的值，
+                    5
+		3	8
+             1	  4   6   10
+          0         
+
+写程序 ，求出该树中位于[min,max]之前的所有数，并使所用方法的时间复杂度和空间复杂度最小
+
+4 一个栈，其结构如下：
+class stack{
+   pop
+
+   push
+	
+   min()
+}
+设计min,使其时间复杂度为o(1)
+
+5 一个硬币，两面不均匀，并且两面出现概率无从获知，
+
+1  设计抛硬币的方法 ，获得1-6等概率事件
+
+2  抛硬币次数为n, 求n与m的关系
+
