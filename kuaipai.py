@@ -1,4 +1,11 @@
+#-*- coding:utf-8 -*-
 import random
+def maopao(lista):
+    lena=len(lista)
+    for i in range(0,lena-1):
+        for j in range(lena-1,i,-1):
+            if lista[j]<lista[j-1]:
+                lista[j],lista[j-1]=lista[j-1],lista[j]
 def qsort(lista,a,b):
     if a>=b:
         return;
@@ -15,10 +22,16 @@ def qsort(lista,a,b):
     lista[i]=key
     qsort(lista,a,i-1)
     qsort(lista,i+1,b)
-listb=[]
-for i in range(10000):
-    listb.append(random.randint(0,10000))
-if __name__=='__main__':
+for k in range(1,5):
+    lista=[]
+    listb=[]
+    for i in range(2000):
+        tmp=random.randint(0,10000)
+        lista.append(tmp)
+        listb.append(tmp)
     import timeit
-    ftest='qsort(listb,0,9999)'
-    print timeit.repeat(ftest,setup='from __main__ import qsort',timeit.default_timer,1,1)
+    qsorttest='qsort(listb,0,1999)'
+    maopaotest='maopao(lista)'
+    print '第%d次排序' %(k)
+    print timeit.repeat(qsorttest,'from __main__ import qsort,listb',timeit.default_timer,1,1)
+    print timeit.repeat(maopaotest,'from __main__ import maopao,lista',timeit.default_timer,1,1)
